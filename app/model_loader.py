@@ -9,8 +9,7 @@ def get_model():
     global _model
     if _model is None:
         model_url = (
-            "https://firebasestorage.googleapis.com/v0/b/toxmap-b74f4.appspot.com/o/"
-            "svm_model_final.pkl?alt=media&token=83df2ee0-e577-4d7f-aa1b-5c59362cec85"
+            "https://firebasestorage.googleapis.com/v0/b/toxmap-b74f4.firebasestorage.app/o/svm_model_fix.pkl?alt=media&token=6f44d9f9-0284-4286-bc09-723030cbdc9f"
         )
         response = requests.get(model_url)
         response.raise_for_status()
