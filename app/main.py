@@ -3,20 +3,11 @@ import os
 import uuid
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from firebase_admin import credentials, firestore, initialize_app
 from app.model_loader import get_model
 from app.firebase_helper import save_scan_result, upload_image_to_storage
 from PIL import Image
 import numpy as np
 from io import BytesIO
-
-# Inisialisasi Firebase dari secret file (Render)
-cred_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-if not cred_path:
-    raise Exception("❌ GOOGLE_APPLICATION_CREDENTIALS tidak ditemukan.")
-cred = credentials.Certificate(cred_path)
-initialize_app(cred)
-db = firestore.client()
 
 # Inisialisasi FastAPI
 app = FastAPI(
