@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+python-multipart
+firebase-admin
+scikit-learn
+joblib
+opencv-python-headless
+pillow
+numpy
+requests
