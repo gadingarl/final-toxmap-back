@@ -1,7 +1,9 @@
 import os
+import uuid
 import firebase_admin
 from firebase_admin import credentials, firestore, storage
 
+# --- Inisialisasi Firebase ---
 cred_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 if not cred_path:
     raise Exception("❌ GOOGLE_APPLICATION_CREDENTIALS tidak ditemukan.")
@@ -12,11 +14,13 @@ if not firebase_admin._apps:
         'storageBucket': 'toxmap-b74f4.appspot.com'
     })
 
+# --- Koneksi Firestore & Storage ---
 db = firestore.client()
 bucket = storage.bucket()
 
+
+# --- Simpan hasil scan ke Firestore ---
 def save_scan_result(user_id, result_label, dropbox_color, image_url=""):
-    import uuid
     doc_ref = db.collection("scan_history").document(str(uuid.uuid4()))
     doc_ref.set({
         "user_id": user_id,
@@ -26,6 +30,8 @@ def save_scan_result(user_id, result_label, dropbox_color, image_url=""):
         "image_url": image_url
     })
 
+
+# --- Upload gambar ke Storage (ke folder scan_images/) ---
 def upload_image_to_storage(file_bytes, filename):
     blob = bucket.blob(f"scan_images/{filename}")
     blob.upload_from_string(file_bytes, content_type="image/jpeg")
