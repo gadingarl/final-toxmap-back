@@ -11,7 +11,7 @@ cred = credentials.Certificate(cred_path)
 
 if not firebase_admin._apps:
     firebase_admin.initialize_app(cred, {
-        'storageBucket': 'toxmap-b74f4.appspot.com'
+        'storageBucket': 'toxmap-b74f4.firebasestorage.app'
     })
 
 # --- Koneksi Firestore & Storage ---
