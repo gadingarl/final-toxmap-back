@@ -8,6 +8,7 @@ from app.firebase_helper import save_scan_result, upload_image_to_storage
 from PIL import Image
 import numpy as np
 from io import BytesIO
+import uvicorn  # <- Tambahan untuk run server
 
 # Inisialisasi FastAPI
 app = FastAPI(
@@ -34,7 +35,6 @@ async def root():
 @app.post("/predict/")
 async def predict(user_id: str = Form(...), file: UploadFile = File(...)):
     try:
-        # Validasi file
         file_extension = file.filename.split('.')[-1].lower()
         if file_extension not in ALLOWED_EXTENSIONS or not file.content_type.startswith("image/"):
             raise HTTPException(status_code=400, detail="❌ Format tidak valid. Gunakan jpg/jpeg/png.")
@@ -43,7 +43,6 @@ async def predict(user_id: str = Form(...), file: UploadFile = File(...)):
         unique_filename = f"{uuid.uuid4()}.jpg"
         image_url = upload_image_to_storage(file_data, unique_filename)
 
-        # Proses gambar
         image = Image.open(BytesIO(file_data)).convert("RGB")
         model = get_model()
         n_features = model.support_vectors_.shape[1]
@@ -83,3 +82,8 @@ async def predict(user_id: str = Form(...), file: UploadFile = File(...)):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"❌ Error: {str(e)}")
+
+# Tambahan supaya bisa jalan di Render
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000))
+    uvicorn.run("app.main:app", host="0.0.0.0", port=port)
