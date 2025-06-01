@@ -8,7 +8,6 @@ from app.firebase_helper import save_scan_result, upload_image_to_storage
 from PIL import Image
 import numpy as np
 from io import BytesIO
-import uvicorn
 
 # Inisialisasi FastAPI
 app = FastAPI(
@@ -27,6 +26,14 @@ app.add_middleware(
 )
 
 ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png"]
+
+# ✅ PRELOAD model saat startup
+print(">>> Preloading model saat startup...")
+try:
+    get_model()
+    print("✅ Model loaded at startup")
+except Exception as e:
+    print(f"❌ Gagal load model saat startup: {str(e)}")
 
 @app.get("/")
 async def root():
@@ -56,7 +63,7 @@ async def predict(user_id: str = Form(...), file: UploadFile = File(...)):
         print(f">>> Image converted to RGB")
 
         model = get_model()
-        print(">>> Model loaded")
+        print(">>> Model loaded from cache")
 
         n_features = model.support_vectors_.shape[1]
         print(f">>> n_features: {n_features}")
@@ -99,9 +106,3 @@ async def predict(user_id: str = Form(...), file: UploadFile = File(...)):
     except Exception as e:
         print(f"❌ ERROR in /predict: {str(e)}")
         raise HTTPException(status_code=500, detail=f"❌ Error: {str(e)}")
-
-# Untuk dijalankan di Render
-# if __name__ == "__main__":
-#     port = int(os.environ.get("PORT", 10000))
-#     uvicorn.run("app.main:app", host="0.0.0.0", port=port)
-
