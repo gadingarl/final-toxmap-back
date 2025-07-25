@@ -1,25 +1,38 @@
 import os
-import uuid
+import json
 import firebase_admin
 from firebase_admin import credentials, firestore, storage
+import uuid
 
-# --- Inisialisasi Firebase ---
-cred_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-if not cred_path:
-    raise Exception("❌ GOOGLE_APPLICATION_CREDENTIALS tidak ditemukan.")
-cred = credentials.Certificate(cred_path)
+bucket = None
+db = None
 
-if not firebase_admin._apps:
-    firebase_admin.initialize_app(cred, {
-        'storageBucket': 'toxmap-b74f4.firebasestorage.app'
-    })
+def init_firebase():
+    global bucket, db
 
-# --- Koneksi Firestore & Storage ---
-db = firestore.client()
-bucket = storage.bucket()
+    service_key_path = os.path.join(os.path.dirname(__file__), '..', 'serviceAccountKey.json')
+    with open(service_key_path, 'r') as f:
+        cred_dict = json.load(f)
 
+    if not firebase_admin._apps:
+        cred = credentials.Certificate(cred_dict)
+        BUCKET_NAME = "toxmap-b74f4.appspot.com"
+        firebase_admin.initialize_app(cred, {
+            'storageBucket': BUCKET_NAME
+        })
 
-# --- Simpan hasil scan ke Firestore ---
+    bucket = storage.bucket()
+    db = firestore.client()
+
+def upload_image_to_storage(file_bytes, filename):
+    try:
+        blob = bucket.blob(f"scan_images/{filename}")
+        blob.upload_from_string(file_bytes, content_type="image/jpeg")
+        blob.make_public()
+        return blob.public_url
+    except Exception as e:
+        raise ValueError(f"Failed to upload image: {str(e)}")
+
 def save_scan_result(user_id, result_label, dropbox_color, image_url=""):
     doc_ref = db.collection("scan_history").document(str(uuid.uuid4()))
     doc_ref.set({
@@ -29,11 +42,3 @@ def save_scan_result(user_id, result_label, dropbox_color, image_url=""):
         "timestamp": firestore.SERVER_TIMESTAMP,
         "image_url": image_url
     })
-
-
-# --- Upload gambar ke Storage (ke folder scan_images/) ---
-def upload_image_to_storage(file_bytes, filename):
-    blob = bucket.blob(f"scan_images/{filename}")
-    blob.upload_from_string(file_bytes, content_type="image/jpeg")
-    blob.make_public()
-    return blob.public_url
