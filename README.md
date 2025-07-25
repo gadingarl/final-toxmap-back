@@ -90,11 +90,6 @@ Respons:
 4. Upload JSON ke Render sebagai Secret File
 5. Set path ke `GOOGLE_APPLICATION_CREDENTIALS`
 
-## 🌍 Deploy
-
-Aplikasi ini dideploy menggunakan [Render](https://render.com/)  
-URL backend live: `https://[nama-aplikasi].onrender.com`
-
 ## 👨‍💻 Developer
 
 Dikembangkan oleh **bbb**  
