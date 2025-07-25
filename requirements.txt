@@ -1,10 +1,17 @@
+wheel>=0.38.4
+setuptools>=65.5.1
+numpy==1.26.4
+tensorflow==2.15.0  # This will install compatible Keras version
+protobuf==4.25.3
+joblib==1.4.2
+scikit-learn==1.6.1
+scikit-image==0.22.0
 fastapi
 uvicorn
 python-multipart
+python-dotenv
 firebase-admin
-scikit-learn
-joblib
-opencv-python-headless
+opencv-python-headless==4.9.0.80
 pillow
-numpy
 requests
+imutils
